@@ -4,7 +4,7 @@ class_name System
 extends Node
 
 ## Required component types for this system
-## Override in subclasses: var required_components = [PositionComponent, VelocityComponent]
+## Override in subclasses: var required_components = [PositionComponent, SpriteComponent]
 var required_components: Array[Script] = []
 
 ## Reference to world

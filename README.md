@@ -13,12 +13,10 @@ ecs/
 
 components/
   ├── position_component.gd
-  ├── velocity_component.gd
   ├── sprite_component.gd
   └── health_component.gd
 
 systems/
-  ├── movement_system.gd
   ├── render_system.gd
   └── death_system.gd
 
@@ -39,8 +37,8 @@ add_child(ecs_world)
 ### 2. Add Systems
 
 ```gdscript
-ecs_world.add_system(MovementSystem.new())
 ecs_world.add_system(RenderSystem.new())
+ecs_world.add_system(DeathSystem.new())
 ```
 
 ### 3. Create Entities
@@ -48,8 +46,8 @@ ecs_world.add_system(RenderSystem.new())
 ```gdscript
 var player = ecs_world.create_entity()
 player.add_component(PositionComponent.new(Vector2(100, 100)))
-player.add_component(VelocityComponent.new(Vector2(50, 0)))
 player.add_component(SpriteComponent.new("res://icon.svg"))
+player.add_component(HealthComponent.new(100))
 ```
 
 ### 4. Update Each Frame
@@ -100,8 +98,8 @@ for enemy in enemies:
 
 ## Demo
 
-Run `demo/ecs_demo.tscn` to see the ECS in action:
-- Entities moving around
+Run `demo/darkwaar5.tscn` or `demo/darkwaar6.tscn` to see the ECS in action:
+- Entities with various components
 - Entity dying after 3 seconds
 - Press SPACE to query entity states
 

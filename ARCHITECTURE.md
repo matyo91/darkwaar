@@ -11,11 +11,11 @@ This is a **lightweight ECS implementation** designed specifically for Godot 4.5
 │                         World                            │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │                    Systems                         │  │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────┐ │  │
-│  │  │ Movement     │  │ Render       │  │ Death   │ │  │
-│  │  │ System       │  │ System       │  │ System  │ │  │
-│  │  │ Priority: 10 │  │ Priority: 100│  │ Pri: 200│ │  │
-│  │  └──────────────┘  └──────────────┘  └─────────┘ │  │
+│  │  ┌──────────────┐  ┌─────────┐                    │  │
+│  │  │ Render       │  │ Death   │                    │  │
+│  │  │ System       │  │ System  │                    │  │
+│  │  │ Priority: 100│  │ Pri: 200│                    │  │
+│  │  └──────────────┘  └─────────┘                    │  │
 │  └───────────────────────────────────────────────────┘  │
 │                                                          │
 │  ┌───────────────────────────────────────────────────┐  │
@@ -28,34 +28,25 @@ This is a **lightweight ECS implementation** designed specifically for Godot 4.5
 
 Entity 1 (Player):
   ├── PositionComponent(x:100, y:100)
-  ├── VelocityComponent(dx:50, dy:0)
   ├── SpriteComponent(texture:"player.png")
   ├── HealthComponent(hp:100)
   └── InputComponent()
 
 Entity 2 (Enemy):
   ├── PositionComponent(x:300, y:200)
-  ├── VelocityComponent(dx:-20, dy:10)
   ├── SpriteComponent(texture:"enemy.png")
   ├── HealthComponent(hp:50)
   └── AIComponent()
 
-Entity 3 (Bullet):
+Entity 3 (Item):
   ├── PositionComponent(x:150, y:150)
-  ├── VelocityComponent(dx:200, dy:0)
-  └── DamageComponent(amount:25)
+  └── SpriteComponent(texture:"item.png")
 ```
 
 ## Data Flow
 
 ```
 Frame Start
-	↓
-┌───────────────────────┐
-│ MovementSystem        │  Priority: 10 (runs first)
-│   For each entity:    │
-│     pos += vel * dt   │
-└───────────────────────┘
 	↓
 ┌───────────────────────┐
 │ RenderSystem          │  Priority: 100
@@ -128,7 +119,6 @@ var player = ecs_world.create_entity()
 
 # Add components (can chain!)
 player.add_component(PositionComponent.new(Vector2(100, 100))) \
-      .add_component(VelocityComponent.new(Vector2.ZERO)) \
       .add_component(SpriteComponent.new("res://player.png")) \
       .add_component(HealthComponent.new(100)) \
       .add_component(InputComponent.new())
@@ -142,7 +132,7 @@ if player.has_component(HealthComponent):
     print("Player is alive!")
 
 # Remove component
-player.remove_component(VelocityComponent)
+player.remove_component(SpriteComponent)
 
 # Destroy entity
 player.destroy()
@@ -274,14 +264,14 @@ func _physics_process(delta):
 # AFTER (ECS)
 # Components:
 # - PositionComponent
-# - VelocityComponent
 # - HealthComponent
 # - InputComponent
+# - SpriteComponent
 
 # Systems:
-# - InputSystem: reads input, sets velocity
-# - MovementSystem: updates position from velocity
+# - InputSystem: reads input, moves entity
 # - RenderSystem: syncs sprite to position
+# - DeathSystem: removes dead entities
 ```
 
 ## Next Steps

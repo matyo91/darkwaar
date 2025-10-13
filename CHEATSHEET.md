@@ -11,8 +11,8 @@ var ecs_world: World = null
 func _ready():
 	ecs_world = World.new()
 	add_child(ecs_world)
-	ecs_world.add_system(MovementSystem.new())
 	ecs_world.add_system(RenderSystem.new())
+	ecs_world.add_system(DeathSystem.new())
 
 func _process(delta):
 	ecs_world.update(delta)
@@ -22,7 +22,7 @@ func _process(delta):
 ```gdscript
 var entity = ecs_world.create_entity()
 entity.add_component(PositionComponent.new(Vector2(100, 100)))
-entity.add_component(VelocityComponent.new(Vector2(50, 0)))
+entity.add_component(SpriteComponent.new("res://icon.svg"))
 ```
 
 ### Create Component
@@ -61,7 +61,7 @@ var e = ecs_world.create_entity()
 
 # Add component (chainable)
 e.add_component(PositionComponent.new())
- .add_component(VelocityComponent.new())
+ .add_component(SpriteComponent.new())
 
 # Get component
 var pos = e.get_component(PositionComponent) as PositionComponent
@@ -71,7 +71,7 @@ if e.has_component(HealthComponent):
 	print("Has health!")
 
 # Remove component
-e.remove_component(VelocityComponent)
+e.remove_component(SpriteComponent)
 
 # Destroy
 e.destroy()
@@ -83,7 +83,7 @@ e.destroy()
 var enemies = ecs_world.query([EnemyTag, HealthComponent])
 
 # Query from system
-var movable = query([PositionComponent, VelocityComponent])
+var positioned = query([PositionComponent, SpriteComponent])
 
 # Process results
 for entity in enemies:
@@ -106,19 +106,6 @@ func on_removed(entity: Entity):
 ```
 
 ## Common Patterns
-
-### Movement
-```gdscript
-# Components
-PositionComponent(position: Vector2)
-VelocityComponent(velocity: Vector2)
-
-# System
-for entity in cached_entities:
-	var pos = entity.get_component(PositionComponent)
-	var vel = entity.get_component(VelocityComponent)
-	pos.position += vel.velocity * delta
-```
 
 ### Health/Damage
 ```gdscript
@@ -187,10 +174,10 @@ var move_input: Vector2 = Vector2.ZERO
 func process(delta: float):
 	for entity in cached_entities:
 		var input = entity.get_component(InputComponent)
-		var vel = entity.get_component(VelocityComponent)
+		var pos = entity.get_component(PositionComponent)
 		
 		input.move_input = Input.get_vector("left", "right", "up", "down")
-		vel.velocity = input.move_input * 200.0
+		pos.position += input.move_input * 200.0 * delta
 ```
 
 ### AI/State Machine
@@ -219,12 +206,12 @@ func process(delta: float):
 # Tag components (no data, just markers)
 class_name PlayerTag extends Component
 class_name EnemyTag extends Component
-class_name BulletTag extends Component
+class_name ItemTag extends Component
 
 # Query by tag
 var player = ecs_world.query([PlayerTag])[0]
 var enemies = ecs_world.query([EnemyTag, HealthComponent])
-var bullets = ecs_world.query([BulletTag, VelocityComponent])
+var items = ecs_world.query([ItemTag, PositionComponent])
 ```
 
 ## System Priority Guide
@@ -232,9 +219,9 @@ var bullets = ecs_world.query([BulletTag, VelocityComponent])
 ```
 Priority Guide (lower = runs first):
   0-50   : Input, AI decisions
-  50-100 : Physics, Movement
-  100-150: Collisions, Interactions
-  150-200: Effects, Rendering
+  50-100 : Logic, Updates
+  100-150: Rendering
+  150-200: Effects
   200+   : Cleanup, Death
 ```
 
@@ -328,18 +315,17 @@ for entity in entities_to_destroy:
 
 ```gdscript
 # Unit test a system
-func test_movement_system():
+func test_death_system():
     var world = World.new()
-    world.add_system(MovementSystem.new())
+    world.add_system(DeathSystem.new())
     
     var entity = world.create_entity()
-    entity.add_component(PositionComponent.new(Vector2(0, 0)))
-    entity.add_component(VelocityComponent.new(Vector2(10, 0)))
+    entity.add_component(HealthComponent.new(0))  # Dead
     
     world.update(1.0)  # 1 second
     
-    var pos = entity.get_component(PositionComponent)
-    assert(pos.position.x == 10)
+    # Entity should be destroyed
+    assert(not world.entities.has(entity.entity_id))
     print("Test passed!")
 ```
 
@@ -362,7 +348,6 @@ func _setup_ecs():
     # Add systems in order
     ecs_world.add_system(InputSystem.new())
     ecs_world.add_system(AISystem.new())
-    ecs_world.add_system(MovementSystem.new())
     ecs_world.add_system(CollisionSystem.new())
     ecs_world.add_system(DamageSystem.new())
     ecs_world.add_system(RenderSystem.new())
@@ -375,7 +360,6 @@ func _create_player():
     var player = ecs_world.create_entity()
     player.add_component(PlayerTag.new()) \
           .add_component(PositionComponent.new(Vector2(400, 300))) \
-          .add_component(VelocityComponent.new()) \
           .add_component(SpriteComponent.new("res://player.png")) \
           .add_component(HealthComponent.new(100)) \
           .add_component(InputComponent.new())
@@ -385,7 +369,6 @@ func _create_enemies(count: int):
         var enemy = ecs_world.create_entity()
         enemy.add_component(EnemyTag.new()) \
              .add_component(PositionComponent.new(Vector2(randf() * 800, randf() * 600))) \
-             .add_component(VelocityComponent.new()) \
              .add_component(SpriteComponent.new("res://enemy.png")) \
              .add_component(HealthComponent.new(50)) \
              .add_component(AIComponent.new())
