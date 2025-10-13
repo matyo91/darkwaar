@@ -1,0 +1,3 @@
+# Tell Godot to ignore markdown files in builds
+*.md
+
