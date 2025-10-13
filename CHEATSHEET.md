@@ -9,13 +9,13 @@ extends Node2D
 var ecs_world: World = null
 
 func _ready():
-    ecs_world = World.new()
-    add_child(ecs_world)
-    ecs_world.add_system(MovementSystem.new())
-    ecs_world.add_system(RenderSystem.new())
+	ecs_world = World.new()
+	add_child(ecs_world)
+	ecs_world.add_system(MovementSystem.new())
+	ecs_world.add_system(RenderSystem.new())
 
 func _process(delta):
-    ecs_world.update(delta)
+	ecs_world.update(delta)
 ```
 
 ### Create Entity
@@ -33,7 +33,7 @@ extends Component
 var my_value: int = 0
 
 func _init(value: int = 0):
-    my_value = value
+	my_value = value
 ```
 
 ### Create System
@@ -42,14 +42,14 @@ class_name MySystem
 extends System
 
 func _init():
-    required_components = [MyComponent, PositionComponent]
-    priority = 50
+	required_components = [MyComponent, PositionComponent]
+	priority = 50
 
 func process(delta: float):
-    for entity in cached_entities:
-        var my = entity.get_component(MyComponent)
-        var pos = entity.get_component(PositionComponent)
-        # Your logic here
+	for entity in cached_entities:
+		var my = entity.get_component(MyComponent)
+		var pos = entity.get_component(PositionComponent)
+		# Your logic here
 ```
 
 ## Common Operations
@@ -68,7 +68,7 @@ var pos = e.get_component(PositionComponent) as PositionComponent
 
 # Check component
 if e.has_component(HealthComponent):
-    print("Has health!")
+	print("Has health!")
 
 # Remove component
 e.remove_component(VelocityComponent)
@@ -87,8 +87,8 @@ var movable = query([PositionComponent, VelocityComponent])
 
 # Process results
 for entity in enemies:
-    var health = entity.get_component(HealthComponent)
-    print(health.current)
+	var health = entity.get_component(HealthComponent)
+	print(health.current)
 ```
 
 ### Component Lifecycle Hooks
@@ -97,12 +97,12 @@ class_name MyComponent
 extends Component
 
 func on_added(entity: Entity):
-    print("Added to entity ", entity.entity_id)
-    # Initialize here
+	print("Added to entity ", entity.entity_id)
+	# Initialize here
 
 func on_removed(entity: Entity):
-    print("Removed from entity ", entity.entity_id)
-    # Cleanup here
+	print("Removed from entity ", entity.entity_id)
+	# Cleanup here
 ```
 
 ## Common Patterns
@@ -115,9 +115,9 @@ VelocityComponent(velocity: Vector2)
 
 # System
 for entity in cached_entities:
-    var pos = entity.get_component(PositionComponent)
-    var vel = entity.get_component(VelocityComponent)
-    pos.position += vel.velocity * delta
+	var pos = entity.get_component(PositionComponent)
+	var vel = entity.get_component(VelocityComponent)
+	pos.position += vel.velocity * delta
 ```
 
 ### Health/Damage
@@ -129,13 +129,13 @@ var current: int
 var maximum: int
 
 func take_damage(amount: int):
-    current = max(0, current - amount)
+	current = max(0, current - amount)
 
 # System
 for entity in cached_entities:
-    var health = entity.get_component(HealthComponent)
-    if health.current <= 0:
-        entity.destroy()
+	var health = entity.get_component(HealthComponent)
+	if health.current <= 0:
+		entity.destroy()
 ```
 
 ### Sprite Rendering
@@ -146,15 +146,15 @@ extends Component
 var sprite: Sprite2D
 
 func on_added(entity: Entity):
-    sprite = Sprite2D.new()
-    entity.add_child(sprite)
-    sprite.texture = load("res://icon.svg")
+	sprite = Sprite2D.new()
+	entity.add_child(sprite)
+	sprite.texture = load("res://icon.svg")
 
 # System
 for entity in cached_entities:
-    var pos = entity.get_component(PositionComponent)
-    var spr = entity.get_component(SpriteComponent)
-    spr.sprite.position = pos.position
+	var pos = entity.get_component(PositionComponent)
+	var spr = entity.get_component(SpriteComponent)
+	spr.sprite.position = pos.position
 ```
 
 ### Timer/Cooldown
@@ -167,14 +167,14 @@ var repeat: bool = false
 
 # System
 for entity in cached_entities:
-    var timer = entity.get_component(TimerComponent)
-    timer.time_left -= delta
-    if timer.time_left <= 0:
-        # Trigger event
-        if timer.repeat:
-            timer.time_left = timer.duration
-        else:
-            entity.remove_component(TimerComponent)
+	var timer = entity.get_component(TimerComponent)
+	timer.time_left -= delta
+	if timer.time_left <= 0:
+		# Trigger event
+		if timer.repeat:
+			timer.time_left = timer.duration
+		else:
+			entity.remove_component(TimerComponent)
 ```
 
 ### Input Handling
@@ -185,12 +185,12 @@ var move_input: Vector2 = Vector2.ZERO
 
 # System
 func process(delta: float):
-    for entity in cached_entities:
-        var input = entity.get_component(InputComponent)
-        var vel = entity.get_component(VelocityComponent)
-        
-        input.move_input = Input.get_vector("left", "right", "up", "down")
-        vel.velocity = input.move_input * 200.0
+	for entity in cached_entities:
+		var input = entity.get_component(InputComponent)
+		var vel = entity.get_component(VelocityComponent)
+		
+		input.move_input = Input.get_vector("left", "right", "up", "down")
+		vel.velocity = input.move_input * 200.0
 ```
 
 ### AI/State Machine
@@ -203,15 +203,15 @@ var target: Entity = null
 
 # System
 func process(delta: float):
-    for entity in cached_entities:
-        var ai = entity.get_component(AIComponent)
-        match ai.state:
-            AIComponent.State.IDLE:
-                _process_idle(entity, ai)
-            AIComponent.State.PATROL:
-                _process_patrol(entity, ai)
-            AIComponent.State.CHASE:
-                _process_chase(entity, ai)
+	for entity in cached_entities:
+		var ai = entity.get_component(AIComponent)
+		match ai.state:
+			AIComponent.State.IDLE:
+				_process_idle(entity, ai)
+			AIComponent.State.PATROL:
+				_process_patrol(entity, ai)
+			AIComponent.State.CHASE:
+				_process_chase(entity, ai)
 ```
 
 ### Tag-based Queries
@@ -243,14 +243,14 @@ Priority Guide (lower = runs first):
 ```gdscript
 # ✅ GOOD: Use cached_entities
 func process(delta: float):
-    for entity in cached_entities:
-        # Fast: iterates only matching entities
+	for entity in cached_entities:
+		# Fast: iterates only matching entities
 
 # ❌ BAD: Query every frame
 func process(delta: float):
-    var entities = world.query([MyComponent])  # Slow!
-    for entity in entities:
-        pass
+	var entities = world.query([MyComponent])  # Slow!
+	for entity in entities:
+		pass
 
 # ✅ GOOD: Cache queries that don't change
 func _ready():
@@ -394,4 +394,3 @@ func _create_enemies(count: int):
 ---
 
 **Pro Tip:** Start simple! Add components and systems one at a time. Test each addition before moving to the next.
-

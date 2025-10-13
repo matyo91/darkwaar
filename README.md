@@ -1,4 +1,4 @@
-# Darkwaar5
+# Darkwaar
 
 A Godot 4.5 project with Entity-Component-System (ECS) architecture.
 

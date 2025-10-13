@@ -50,26 +50,26 @@ Entity 3 (Bullet):
 
 ```
 Frame Start
-    ↓
+	↓
 ┌───────────────────────┐
 │ MovementSystem        │  Priority: 10 (runs first)
 │   For each entity:    │
 │     pos += vel * dt   │
 └───────────────────────┘
-    ↓
+	↓
 ┌───────────────────────┐
 │ RenderSystem          │  Priority: 100
 │   For each entity:    │
 │     sprite.pos = pos  │
 └───────────────────────┘
-    ↓
+	↓
 ┌───────────────────────┐
 │ DeathSystem           │  Priority: 200 (runs last)
 │   For each entity:    │
 │     if hp <= 0:       │
 │       destroy()       │
 └───────────────────────┘
-    ↓
+	↓
 Frame End
 ```
 
@@ -94,18 +94,18 @@ Systems maintain a **cached list** of matching entities for performance:
 ```
 World creates Entity:
   └─> Check all Systems
-      └─> If matches required_components:
-          └─> Add to system.cached_entities
+	  └─> If matches required_components:
+		  └─> Add to system.cached_entities
 
 Component added to Entity:
   └─> Check all Systems
-      └─> If now matches:
-          └─> Add to system.cached_entities
+	  └─> If now matches:
+		  └─> Add to system.cached_entities
 
 Component removed from Entity:
   └─> Check all Systems
-      └─> If no longer matches:
-          └─> Remove from system.cached_entities
+	  └─> If no longer matches:
+		  └─> Remove from system.cached_entities
 ```
 
 This means systems don't search all entities every frame!
@@ -203,13 +203,13 @@ class_name DamageProcessingSystem
 extends System
 
 func process(delta: float) -> void:
-    # Process entities with damage events
-    for entity in world.query([DamageEvent, HealthComponent]):
-        var event = entity.get_component(DamageEvent)
-        var health = entity.get_component(HealthComponent)
-        
-        health.take_damage(event.amount)
-        entity.remove_component(DamageEvent)  # Clear event
+	# Process entities with damage events
+	for entity in world.query([DamageEvent, HealthComponent]):
+		var event = entity.get_component(DamageEvent)
+		var health = entity.get_component(HealthComponent)
+		
+		health.take_damage(event.amount)
+		entity.remove_component(DamageEvent)  # Clear event
 ```
 
 ### Pattern 2: State Machine Component
@@ -268,8 +268,8 @@ var health: int = 100
 var speed: float = 200
 
 func _physics_process(delta):
-    velocity = Input.get_vector(...) * speed
-    move_and_slide()
+	velocity = Input.get_vector(...) * speed
+	move_and_slide()
 
 # AFTER (ECS)
 # Components:
@@ -307,4 +307,3 @@ A: Yes! Serialize components to JSON/binary.
 
 **Q: Performance with 10,000 entities?**
 A: Should be fine. Use system caching and test. Consider pooling.
-

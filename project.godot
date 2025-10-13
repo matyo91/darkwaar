@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Darkwaar5"
-run/main_scene="res://demo/ecs_demo.tscn"
+config/name="Darkwaar"
+run/main_scene="res://demo/darkwaar5.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
