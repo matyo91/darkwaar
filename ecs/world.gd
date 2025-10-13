@@ -99,4 +99,3 @@ func _rebuild_system_cache(system: System) -> void:
 		if system.matches(entity):
 			system.cached_entities.append(entity)
 			system.on_entity_added(entity)
-

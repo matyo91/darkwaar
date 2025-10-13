@@ -17,4 +17,3 @@ func process(delta: float) -> void:
 		
 		if sprite_comp.sprite:
 			sprite_comp.sprite.position = pos.position
-

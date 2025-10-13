@@ -56,4 +56,3 @@ func query(component_types: Array[Script]) -> Array[Entity]:
 		if has_all:
 			result.append(entity)
 	return result
-

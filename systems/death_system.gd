@@ -19,4 +19,3 @@ func process(delta: float) -> void:
 		if not health.is_alive():
 			print("Entity %d died!" % entity.entity_id)
 			entity.destroy()
-

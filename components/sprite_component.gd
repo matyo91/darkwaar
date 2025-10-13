@@ -24,4 +24,3 @@ func on_removed(entity: Entity) -> void:
 	if sprite:
 		sprite.queue_free()
 		sprite = null
-

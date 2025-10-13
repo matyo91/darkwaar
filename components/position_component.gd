@@ -7,4 +7,3 @@ var position: Vector2 = Vector2.ZERO
 
 func _init(pos: Vector2 = Vector2.ZERO) -> void:
 	position = pos
-

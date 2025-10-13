@@ -21,4 +21,3 @@ func heal(amount: int) -> void:
 
 func is_alive() -> bool:
 	return current > 0
-

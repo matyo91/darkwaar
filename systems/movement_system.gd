@@ -17,4 +17,3 @@ func process(delta: float) -> void:
 		
 		# Update position
 		pos.position += vel.velocity * delta
-

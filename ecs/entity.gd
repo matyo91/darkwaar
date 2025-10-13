@@ -65,4 +65,3 @@ func get_all_components() -> Array:
 func destroy() -> void:
 	if world:
 		world.destroy_entity(self)
-

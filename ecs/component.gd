@@ -16,4 +16,3 @@ func on_added(entity: Entity) -> void:
 ## Optional: Called when component is removed from entity
 func on_removed(entity: Entity) -> void:
 	pass
-

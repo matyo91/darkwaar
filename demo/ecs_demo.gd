@@ -83,4 +83,3 @@ func _input(event: InputEvent) -> void:
 			var pos = entity.get_component(PositionComponent) as PositionComponent
 			var vel = entity.get_component(VelocityComponent) as VelocityComponent
 			print("  Entity %d: pos=%s, vel=%s" % [entity.entity_id, pos.position, vel.velocity])
-
