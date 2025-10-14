@@ -63,17 +63,17 @@ func _create_entities_3d() -> void:
 	## Create entities that will appear in the 3D GridMap
 	## Example 1: Entity at grid position
 	var entity1 = ecs_world.create_entity()
-	entity1.add_component(PositionComponent.new(Vector2(0, 0)))  # Grid coordinates
+	entity1.add_component(PositionComponent.new(Vector2(-1, 0)))  # Grid coordinates
 	entity1.add_component(HealthComponent.new(100))
 	
 	## Example 2: Another entity
 	var entity2 = ecs_world.create_entity()
-	entity2.add_component(PositionComponent.new(Vector2(2, 2)))  # Grid coordinates
+	entity2.add_component(PositionComponent.new(Vector2(1, 1)))  # Grid coordinates
 	entity2.add_component(HealthComponent.new(100))
 	
 	## Example 3: Entity at different position
 	var entity3 = ecs_world.create_entity()
-	entity3.add_component(PositionComponent.new(Vector2(4, 1)))  # Grid coordinates
+	entity3.add_component(PositionComponent.new(Vector2(-1, 1)))  # Grid coordinates
 	entity3.add_component(HealthComponent.new(50))
 	
 	# Create 3D representations in GridMap
