@@ -11,6 +11,11 @@ config_version=5
 [application]
 
 config/name="Darkwaar"
-run/main_scene="res://demo/darkwaar5.tscn"
+run/main_scene="uid://dkl05rsa4eck3"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=648
+window/size/viewport_height=1152

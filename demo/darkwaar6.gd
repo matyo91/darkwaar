@@ -1,21 +1,36 @@
-## ECS Demo - Shows how to use the ECS system
-extends Node2D
+## ECS Demo - Mobile-first with 3D GridMap + 2D Cards
+extends Control
 
 ## Reference to ECS world
 var ecs_world: World = null
+
+## 3D Scene references
+@onready var world_3d: Node3D = $VBoxContainer/TopView3D/SubViewport/World3D
+@onready var camera_3d: Camera3D = $VBoxContainer/TopView3D/SubViewport/World3D/Camera3D
+@onready var grid_map: GridMap = $VBoxContainer/TopView3D/SubViewport/World3D/GridMap
+
+## 2D UI references
+@onready var cards_container: HBoxContainer = $VBoxContainer/BottomView2D/MarginContainer/VBoxContainer/CardsContainer
+@onready var effects_label: Label = $VBoxContainer/BottomView2D/MarginContainer/VBoxContainer/EffectsLabel
 
 
 func _ready() -> void:
 	# Create the ECS world
 	ecs_world = World.new()
-	add_child(ecs_world)
+	world_3d.add_child(ecs_world)
 	
 	# Add systems to the world
 	ecs_world.add_system(RenderSystem.new())
 	ecs_world.add_system(DeathSystem.new())
 	
+	# Setup 3D view
+	_setup_3d_world()
+	
+	# Setup 2D cards UI
+	_setup_cards_ui()
+	
 	# Create some example entities
-	_create_moving_entities()
+	_create_entities_3d()
 	
 	# Demo: Create entity that will die
 	_create_dying_entity()
@@ -26,30 +41,63 @@ func _process(delta: float) -> void:
 	ecs_world.update(delta)
 
 
-func _create_moving_entities() -> void:
-	## Example 1: Entity with sprite
+func _setup_3d_world() -> void:
+	## Setup the 3D GridMap world
+	# GridMap will be configured for tile-based entities
+	pass
+
+
+func _setup_cards_ui() -> void:
+	## Setup the cards and effects UI
+	# Create example card buttons in horizontal row at bottom (portrait mode)
+	for i in range(3):
+		var card_button = Button.new()
+		card_button.text = "Card\n%d" % (i + 1)
+		card_button.custom_minimum_size = Vector2(90, 110)
+		card_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card_button.pressed.connect(_on_card_pressed.bind(i + 1))
+		cards_container.add_child(card_button)
+
+
+func _create_entities_3d() -> void:
+	## Create entities that will appear in the 3D GridMap
+	## Example 1: Entity at grid position
 	var entity1 = ecs_world.create_entity()
-	entity1.add_component(PositionComponent.new(Vector2(100, 100)))
-	entity1.add_component(SpriteComponent.new("res://icon.svg"))
+	entity1.add_component(PositionComponent.new(Vector2(0, 0)))  # Grid coordinates
 	entity1.add_component(HealthComponent.new(100))
 	
 	## Example 2: Another entity
 	var entity2 = ecs_world.create_entity()
-	entity2.add_component(PositionComponent.new(Vector2(200, 200)))
-	entity2.add_component(SpriteComponent.new("res://icon.svg"))
+	entity2.add_component(PositionComponent.new(Vector2(2, 2)))  # Grid coordinates
 	entity2.add_component(HealthComponent.new(100))
 	
-	## Example 3: Entity with no sprite
+	## Example 3: Entity at different position
 	var entity3 = ecs_world.create_entity()
-	entity3.add_component(PositionComponent.new(Vector2(300, 300)))
+	entity3.add_component(PositionComponent.new(Vector2(4, 1)))  # Grid coordinates
 	entity3.add_component(HealthComponent.new(50))
+	
+	# Create 3D representations in GridMap
+	_spawn_entities_in_grid()
+
+
+func _spawn_entities_in_grid() -> void:
+	## Spawn 3D mesh instances in GridMap for each entity
+	var entities = ecs_world.query([PositionComponent])
+	for entity in entities:
+		var pos = entity.get_component(PositionComponent) as PositionComponent
+		# Create a simple 3D visual representation
+		var mesh_instance = MeshInstance3D.new()
+		var box_mesh = BoxMesh.new()
+		box_mesh.size = Vector3(0.8, 0.8, 0.8)
+		mesh_instance.mesh = box_mesh
+		mesh_instance.position = Vector3(pos.position.x, 0.5, pos.position.y)
+		world_3d.add_child(mesh_instance)
 
 
 func _create_dying_entity() -> void:
 	## Create entity that will die in 3 seconds
 	var dying_entity = ecs_world.create_entity()
-	dying_entity.add_component(PositionComponent.new(Vector2(400, 100)))
-	dying_entity.add_component(SpriteComponent.new("res://icon.svg"))
+	dying_entity.add_component(PositionComponent.new(Vector2(6, 3)))
 	dying_entity.add_component(HealthComponent.new(100))
 	
 	# Kill it after 3 seconds
@@ -57,7 +105,35 @@ func _create_dying_entity() -> void:
 	var health = dying_entity.get_component(HealthComponent) as HealthComponent
 	if health:
 		health.take_damage(100)
+		_show_effect("Entity destroyed!")
 		print("Dealt 100 damage to entity %d" % dying_entity.entity_id)
+
+
+func _on_card_pressed(card_id: int) -> void:
+	## Handle card button press
+	_show_effect("Card %d played!" % card_id)
+	print("Card %d activated" % card_id)
+	
+	# Example: Damage random entity
+	var entities = ecs_world.query([HealthComponent])
+	if entities.size() > 0:
+		var random_entity = entities[randi() % entities.size()]
+		var health = random_entity.get_component(HealthComponent) as HealthComponent
+		health.take_damage(10)
+		print("Dealt 10 damage to entity %d (HP: %d/%d)" % [
+			random_entity.entity_id, 
+			health.current, 
+			health.maximum
+		])
+
+
+func _show_effect(message: String) -> void:
+	## Show effect message in the bottom panel UI
+	effects_label.text = message
+	# Auto-clear after 2 seconds
+	await get_tree().create_timer(2.0).timeout
+	if effects_label.text == message:  # Only clear if not replaced
+		effects_label.text = "Tap a card to play"
 
 
 ## Demo: Manually query entities
@@ -68,13 +144,17 @@ func _input(event: InputEvent) -> void:
 		# Query all entities with health
 		var entities_with_health = ecs_world.query([HealthComponent])
 		print("Entities with health: %d" % entities_with_health.size())
+		var status_text = "Entities: %d\n" % entities_with_health.size()
+		
 		for entity in entities_with_health:
 			var health = entity.get_component(HealthComponent) as HealthComponent
-			print("  Entity %d: HP = %d/%d" % [entity.entity_id, health.current, health.maximum])
-		
-		# Query entities with position
-		var positioned_entities = ecs_world.query([PositionComponent])
-		print("\nPositioned entities: %d" % positioned_entities.size())
-		for entity in positioned_entities:
 			var pos = entity.get_component(PositionComponent) as PositionComponent
-			print("  Entity %d: pos=%s" % [entity.entity_id, pos.position])
+			print("  Entity %d: HP = %d/%d at %s" % [
+				entity.entity_id, 
+				health.current, 
+				health.maximum,
+				pos.position if pos else "N/A"
+			])
+			status_text += "E%d: HP %d/%d " % [entity.entity_id, health.current, health.maximum]
+		
+		_show_effect(status_text.strip_edges())

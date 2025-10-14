@@ -1,16 +1,71 @@
-[gd_scene load_steps=2 format=3 uid="uid://b6ybhwjj4hc7w"]
+[gd_scene load_steps=2 format=3 uid="uid://dkl05rsa4eck3"]
 
-[ext_resource type="Script" uid="uid://dkiuyqypurobu" path="res://demo/darkwaar5.gd" id="1_sq5ut"]
+[ext_resource type="Script" path="res://demo/darkwaar6.gd" id="1_darkwaar6"]
 
-[node name="Darkwaar5" type="Node2D"]
-script = ExtResource("1_sq5ut")
+[node name="Darkwaar6" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_darkwaar6")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(300, 200)
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Label" type="Label" parent="."]
-offset_right = 600.0
-offset_bottom = 100.0
-text = "ECS Demo
-Press SPACE to query entities
-Watch entities move and one dies after 3s"
+[node name="TopView3D" type="SubViewportContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="VBoxContainer/TopView3D"]
+handle_input_filter = 2
+size = Vector2i(400, 700)
+render_target_update_mode = 4
+
+[node name="World3D" type="Node3D" parent="VBoxContainer/TopView3D/SubViewport"]
+
+[node name="Camera3D" type="Camera3D" parent="VBoxContainer/TopView3D/SubViewport/World3D"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 8, 8)
+fov = 60.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="VBoxContainer/TopView3D/SubViewport/World3D"]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 10, 0)
+shadow_enabled = true
+
+[node name="GridMap" type="GridMap" parent="VBoxContainer/TopView3D/SubViewport/World3D"]
+
+[node name="BottomView2D" type="PanelContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/BottomView2D"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/BottomView2D/MarginContainer"]
+layout_mode = 2
+
+[node name="EffectsLabel" type="Label" parent="VBoxContainer/BottomView2D/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tap a card to play"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/BottomView2D/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CardsContainer" type="HBoxContainer" parent="VBoxContainer/BottomView2D/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+alignment = 1
