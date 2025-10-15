@@ -29,26 +29,26 @@ func _process(delta: float) -> void:
 func _create_moving_entities() -> void:
 	## Example 1: Entity with sprite
 	var entity1 = ecs_world.create_entity()
-	entity1.add_component(PositionComponent.new(Vector2(100, 100)))
+	entity1.add_component(PositionComponent.new(Vector3(100, 0, 100)))
 	entity1.add_component(SpriteComponent.new("res://icon.svg"))
 	entity1.add_component(HealthComponent.new(100))
 	
 	## Example 2: Another entity
 	var entity2 = ecs_world.create_entity()
-	entity2.add_component(PositionComponent.new(Vector2(200, 200)))
+	entity2.add_component(PositionComponent.new(Vector3(200, 0, 200)))
 	entity2.add_component(SpriteComponent.new("res://icon.svg"))
 	entity2.add_component(HealthComponent.new(100))
 	
 	## Example 3: Entity with no sprite
 	var entity3 = ecs_world.create_entity()
-	entity3.add_component(PositionComponent.new(Vector2(300, 300)))
+	entity3.add_component(PositionComponent.new(Vector3(300, 0, 300)))
 	entity3.add_component(HealthComponent.new(50))
 
 
 func _create_dying_entity() -> void:
 	## Create entity that will die in 3 seconds
 	var dying_entity = ecs_world.create_entity()
-	dying_entity.add_component(PositionComponent.new(Vector2(400, 100)))
+	dying_entity.add_component(PositionComponent.new(Vector3(400, 0, 100)))
 	dying_entity.add_component(SpriteComponent.new("res://icon.svg"))
 	dying_entity.add_component(HealthComponent.new(100))
 	

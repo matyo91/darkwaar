@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Darkwaar"
-run/main_scene="uid://dkl05rsa4eck3"
+run/main_scene="uid://bulc4mx1aa2ft"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 

@@ -39,6 +39,9 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	# Update ECS world every frame
 	ecs_world.update(delta)
+	
+	# Update health labels
+	_update_health_labels()
 
 
 func _setup_3d_world() -> void:
@@ -81,10 +84,12 @@ func _create_entities_3d() -> void:
 
 
 func _spawn_entities_in_grid() -> void:
-	## Spawn 3D mesh instances in GridMap for each entity
+	## Spawn 3D mesh instances in GridMap for each entity with health display
 	var entities = ecs_world.query([PositionComponent])
 	for entity in entities:
 		var pos = entity.get_component(PositionComponent) as PositionComponent
+		var health = entity.get_component(HealthComponent) as HealthComponent
+		
 		# Create a simple 3D visual representation
 		var mesh_instance = MeshInstance3D.new()
 		var box_mesh = BoxMesh.new()
@@ -92,6 +97,20 @@ func _spawn_entities_in_grid() -> void:
 		mesh_instance.mesh = box_mesh
 		mesh_instance.position = pos.position
 		world_3d.add_child(mesh_instance)
+		
+		# Add health display label above the entity
+		if health:
+			var label_3d = Label3D.new()
+			label_3d.text = "%d/%d" % [health.current, health.maximum]
+			label_3d.position = pos.position + Vector3(0, 1.2, 0)  # Above the entity
+			label_3d.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+			label_3d.font_size = 32
+			label_3d.outline_size = 4
+			label_3d.modulate = Color.WHITE
+			world_3d.add_child(label_3d)
+			
+			# Store reference for updating
+			entity.set_meta("health_label", label_3d)
 
 
 func _create_dying_entity() -> void:
@@ -125,6 +144,25 @@ func _on_card_pressed(card_id: int) -> void:
 			health.current, 
 			health.maximum
 		])
+
+
+func _update_health_labels() -> void:
+	## Update health labels for all entities
+	var entities = ecs_world.query([HealthComponent])
+	for entity in entities:
+		if entity.has_meta("health_label"):
+			var health = entity.get_component(HealthComponent) as HealthComponent
+			var label = entity.get_meta("health_label") as Label3D
+			if label and health:
+				label.text = "%d/%d" % [health.current, health.maximum]
+				# Change color based on health percentage
+				var health_percent = float(health.current) / float(health.maximum)
+				if health_percent > 0.6:
+					label.modulate = Color.GREEN
+				elif health_percent > 0.3:
+					label.modulate = Color.YELLOW
+				else:
+					label.modulate = Color.RED
 
 
 func _show_effect(message: String) -> void:
